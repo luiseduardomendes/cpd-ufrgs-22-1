@@ -9,7 +9,7 @@ def shellsort (arr : list, engine : str = 'KNUTH', filename: str = 'saida1.txt')
 
         for i in arr[:-1]:
             file.write(f'{i}, ')
-        file.write(f'{i} SEQ=CIURA\n')
+        file.write(f'{arr[-1]} SEQ=CIURA\n')
         
         i = 0
         while ciura[i] < N:
@@ -28,21 +28,21 @@ def shellsort (arr : list, engine : str = 'KNUTH', filename: str = 'saida1.txt')
                     j -= h
             for i in arr[:-1]:
                 file.write(f'{i}, ')
-            file.write(f'{i} INCR={h}\n')
+            file.write(f'{arr[-1]} INCR={h}\n')
             
     else:
         h = 1
         if engine == 'KNUTH':
             for i in arr[:-1]:
                 file.write(f'{i}, ')
-            file.write(f'{i} SEQ=KNUTH\n')
+            file.write(f'{arr[-1]} SEQ=KNUTH\n')
             x = 3
             while h < N // 3:
                 h = 3*h + 1
         elif engine == 'SHELL':
             for i in arr[:-1]:
                 file.write(f'{i}, ')
-            file.write(f'{i} SEQ=SHELL\n')
+            file.write(f'{arr[-1]} SEQ=SHELL\n')
             x = 2
             while h < N // 2:
                 h = 2*h
@@ -57,7 +57,7 @@ def shellsort (arr : list, engine : str = 'KNUTH', filename: str = 'saida1.txt')
                     j -= h
             for i in arr[:-1]:
                 file.write(f'{i}, ')
-            file.write(f'{i} INCR={h}\n')
+            file.write(f'{arr[-1]} INCR={h}\n')
             h //= x
 
     file.close()
@@ -74,14 +74,18 @@ keys = ('SHELL', 'KNUTH', 'CIURA')
 
 with open(filename) as f:
     for line in f:
-        arr = line[:-1].split(sep=' ')[:-1]
+        arr = line
+        if arr.endswith('\n'):
+            arr = arr[:-1]
+        arr = arr.split(sep=' ')
+
         for i, e in enumerate(arr):
             arr[i] = int(e)
 
         arr.pop(0)
         for key in keys:
             a = shellsort(arr[:], key, outname)
-            print(key, a)
+            #print(key, a)
 
 
 
