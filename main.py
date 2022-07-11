@@ -45,3 +45,4 @@ with open(filename) as f:
             f_out.write(f'{sequence},{len(array)},{execution_time}\n')
 
     f.close()
+
