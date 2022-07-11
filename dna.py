@@ -47,4 +47,6 @@ def sort_data_sets(ds):
 
 ds = _read_input()
 a = sort_data_sets(ds[:])
-pprint(a)
+print()
+for i in a:
+    print(i)

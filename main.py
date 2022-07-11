@@ -1,4 +1,3 @@
-from fileinput import filename
 from time import time
 from lib.shell_sort import shellsort, shellsort_file_write
 
@@ -6,7 +5,7 @@ def read_input(data : str) -> list :
     a = data.split()
     a = a[1:]
     a = [int(i) for i in a]
-    return a;
+    return a
 
 files = (
     'data_input/entrada1.txt',
@@ -20,13 +19,15 @@ sequences = (
     'CIURA'
 )
 
+filename = files[0]
+
 '''
-filename = files[3]
+open('saida1.txt', 'w').close()
 with open(filename) as f:
     for line in f:
         array = read_input(line)
         for sequence in sequences:
-            sorted_array = shellsort_file_write(array[:], sequence, 'saida3.txt')
+            sorted_array = shellsort_file_write(array[:], sequence, 'saida1.txt')
     f.close()
 '''
 
@@ -38,11 +39,9 @@ with open(filename) as f:
     for line in f:
         array = read_input(line)
         for sequence in sequences:
-            __begin__ = time()
+            begin = time()
             sorted_array = shellsort(array[:], sequence)
-            __end__ = time()
-            execution_time = __end__ - __begin__
+            end = time()
+            execution_time = end - begin
             f_out.write(f'{sequence},{len(array)},{execution_time}\n')
-
-    f.close()
-
+    f.close() 
