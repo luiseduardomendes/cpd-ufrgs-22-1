@@ -1,4 +1,4 @@
-def shellsort (arr : list, engine : str = 'KNUTH', filename: str = 'saida1.txt') -> list:
+def shellsort_file_write (arr : list, engine : str = 'KNUTH', filename: str = 'saida1.txt') -> list:
     N = len(arr)
 
     file = open(filename, 'a')
@@ -64,6 +64,53 @@ def shellsort (arr : list, engine : str = 'KNUTH', filename: str = 'saida1.txt')
 
     return arr
 
+
+def shellsort (arr : list, engine : str = 'KNUTH') -> list:
+    N = len(arr)
+
+    if engine == 'CIURA':
+        ciura = [1,4,10,23,57,132,301,701,1577,3548,7983,17961,40412,90927,204585,460316,1035711]
+        
+        i = 0
+        while ciura[i] < N:
+            i += 1
+
+        ciura = ciura[:i]
+        ciura.reverse()
+
+        for h in ciura:
+            for i in range(h, N):
+                t = arr[i]
+                j = i
+                while j >= h and t < arr[j - h]: 
+                    arr[j] = arr[j-h]
+                    arr[j-h] = t
+                    j -= h
+            
+    else:
+        h = 1
+        if engine == 'KNUTH':
+            x = 3
+            while h < N // 3:
+                h = 3*h + 1
+        elif engine == 'SHELL':
+            x = 2
+            while h < N // 2:
+                h = 2*h
+
+        while h >= 1:
+            for i in range(h, N):
+                t = arr[i]
+                j = i
+                while j >= h and t < arr[j - h]: 
+                    arr[j] = arr[j-h]
+                    arr[j-h] = t
+                    j -= h
+            h //= x
+
+    return arr
+
+'''
 filename ='entrada3.txt'
 outname = 'saida3.txt'
 
@@ -86,9 +133,4 @@ with open(filename) as f:
         for key in keys:
             a = shellsort(arr[:], key, outname)
             #print(key, a)
-
-
-
-
-
-        
+'''

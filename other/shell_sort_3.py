@@ -1,4 +1,4 @@
-def shellsort (arr : list, engine : str = 'KNUTH') -> list:
+def shellsort (arr, engine : str = 'CIURA') -> list:
     N = len(arr)
 
     if engine == 'CIURA':
