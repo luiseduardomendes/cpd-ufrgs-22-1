@@ -1,5 +1,7 @@
 from time import time
+from traceback import print_tb
 from lib.shell_sort import shellsort, shellsort_file_write
+import numpy as np
 
 def read_input(data : str) -> list :
     a = data.split()
@@ -40,8 +42,9 @@ with open(filename) as f:
         array = read_input(line)
         for sequence in sequences:
             begin = time()
-            sorted_array = shellsort(array[:], sequence)
+            sorted_array = shellsort(np.array(array[:]), sequence)
             end = time()
             execution_time = end - begin
+            print(len(array), execution_time)
             f_out.write(f'{sequence},{len(array)},{execution_time}\n')
     f.close() 
