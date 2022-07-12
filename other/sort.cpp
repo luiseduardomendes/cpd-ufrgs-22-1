@@ -3,7 +3,7 @@
 #include <string>
 #include <algorithm>
 #include <cstdlib>
-#include<time.h>
+#include <time.h>
 #include <fstream>
 
 using namespace std;
@@ -112,10 +112,14 @@ vector<vector<int>> read_file(string filename){
 int main(){
     time_t __begin, __end;
     vector<vector<int>> mult_dim_arr;
-    vector<string> sequences = {"SHELL","KNUTH","CIURA"};    
+    vector<string> sequences = {"SHELL","KNUTH","CIURA"};
+
+    FILE *file;
+
+    file = fopen("../data_output/saida2.txt", "w");  
 
     for (int j = 0; j < sequences.size(); j ++){
-        mult_dim_arr = read_file("data_input/entrada2.txt");
+        mult_dim_arr = read_file("../data_input/entrada2.txt");
         for (int i = 0 ; i < mult_dim_arr.size(); i ++){
             
             __begin = clock();
@@ -123,8 +127,12 @@ int main(){
             mult_dim_arr[i].erase(mult_dim_arr[i].begin());
             shellsort(mult_dim_arr[i], sequences[j]);
             __end = clock();
+            fprintf(file, "%s, %d: %.8lfs\n", sequences[j].c_str(), n, (double)(__end - __begin)/CLOCKS_PER_SEC);
             printf("%s, %d: %.8lfs\n", sequences[j].c_str(), n, (double)(__end - __begin)/CLOCKS_PER_SEC);
         }
     }
+
+    fclose(file);
+
     return 0;
 }
