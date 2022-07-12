@@ -8,6 +8,7 @@
 using namespace std;
 
 template<typename Comparable>
+vector<int> shellsort (vector<int> & array, string engine);
 
 vector<int> shellsort (vector<int> & array, string engine){
     int x, N, h, t, i, j;
@@ -70,23 +71,42 @@ vector<int> shellsort (vector<int> & array, string engine){
 
 int main(){
     vector<int> array;
-    int max = 100;
+    int max = 100000;
+    time_t __begin, __end;
 
     srand(time(0));
 
     for (int i = 0; i < max; i ++){
-        array.push_back(rand() % 10);
+        array.push_back(rand() % 100000);
     }
 
+    __begin = clock();
+    shellsort(array, string("SHELL"));
+    __end = clock();
+    
+    printf("execution time: %.2lf\n", (double)(__end - __begin)/CLOCKS_PER_SEC);
+
+    array.clear();
     for (int i = 0; i < max; i ++){
-        printf("%d ", array[i]);
+        array.push_back(rand() % 100000);
     }
 
-    //shellsort(array, string("KNUTH"));
+    __begin = clock();
+    shellsort(array, string("KNUTH"));
+    __end = clock();
+    
+    printf("execution time: %.2lf\n", (double)(__end - __begin)/CLOCKS_PER_SEC);
 
+    array.clear();
     for (int i = 0; i < max; i ++){
-        printf("%d ", array[i]);
+        array.push_back(rand() % 100000);
     }
+
+    __begin = clock();
+    shellsort(array, string("CIURA"));
+    __end = clock();
+    
+    printf("execution time: %.2lf\n", (double)(__end - __begin)/CLOCKS_PER_SEC);
 
     return 0;
 }
