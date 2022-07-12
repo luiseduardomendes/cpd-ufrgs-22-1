@@ -4,11 +4,13 @@
 #include <algorithm>
 #include <cstdlib>
 #include<time.h>
+#include <fstream>
 
 using namespace std;
 
 template<typename Comparable>
 vector<int> shellsort (vector<int> & array, string engine);
+vector<vector<int>> read_file(string filename);
 
 vector<int> shellsort (vector<int> & array, string engine){
     int x, N, h, t, i, j;
@@ -27,7 +29,8 @@ vector<int> shellsort (vector<int> & array, string engine){
             
         reverse(ciura.begin(), ciura.end());
 
-        for (h = 0; h < ciura.size(); h ++){
+        for (int k = 0; k < ciura.size(); k ++){
+            h = ciura[k];
             for (i = h; i < N; i ++){
                 t = array[i];
                 j = i;
@@ -69,44 +72,59 @@ vector<int> shellsort (vector<int> & array, string engine){
     return array;
 }
 
-int main(){
+// split function was get from internet
+vector<int> split(const string& text, char sep){
+    vector<string> tokens;
     vector<int> array;
-    int max = 100000;
+    size_t start = 0, end = 0;
+
+    while ((end = text.find(sep, start)) != string::npos)
+    {
+        tokens.push_back(text.substr(start, end - start));
+        start = end + 1;
+    }
+
+    tokens.push_back(text.substr(start));
+    
+    for (int i = 0; i < tokens.size(); i ++){
+        array.push_back(atoi(tokens[i].c_str()));
+    }
+    
+    return array;
+}
+
+vector<vector<int>> read_file(string filename){
+    vector<vector<int>> buffer;
+    fstream file;
+    file.open(filename, ios::in);
+
+    if(file.is_open()){
+        string tp;
+        while(getline(file, tp)){
+            buffer.push_back(split(tp, ' '));
+        }
+    }
+    file.close();
+    return buffer;
+
+}
+
+int main(){
     time_t __begin, __end;
+    vector<vector<int>> mult_dim_arr;
+    vector<string> sequences = {"SHELL","KNUTH","CIURA"};    
 
-    srand(time(0));
-
-    for (int i = 0; i < max; i ++){
-        array.push_back(rand() % 100000);
+    for (int j = 0; j < sequences.size(); j ++){
+        mult_dim_arr = read_file("data_input/entrada2.txt");
+        for (int i = 0 ; i < mult_dim_arr.size(); i ++){
+            
+            __begin = clock();
+            int n = mult_dim_arr[i][0];
+            mult_dim_arr[i].erase(mult_dim_arr[i].begin());
+            shellsort(mult_dim_arr[i], sequences[j]);
+            __end = clock();
+            printf("%s, %d: %.8lfs\n", sequences[j].c_str(), n, (double)(__end - __begin)/CLOCKS_PER_SEC);
+        }
     }
-
-    __begin = clock();
-    shellsort(array, string("SHELL"));
-    __end = clock();
-    
-    printf("execution time: %.2lf\n", (double)(__end - __begin)/CLOCKS_PER_SEC);
-
-    array.clear();
-    for (int i = 0; i < max; i ++){
-        array.push_back(rand() % 100000);
-    }
-
-    __begin = clock();
-    shellsort(array, string("KNUTH"));
-    __end = clock();
-    
-    printf("execution time: %.2lf\n", (double)(__end - __begin)/CLOCKS_PER_SEC);
-
-    array.clear();
-    for (int i = 0; i < max; i ++){
-        array.push_back(rand() % 100000);
-    }
-
-    __begin = clock();
-    shellsort(array, string("CIURA"));
-    __end = clock();
-    
-    printf("execution time: %.2lf\n", (double)(__end - __begin)/CLOCKS_PER_SEC);
-
     return 0;
 }
