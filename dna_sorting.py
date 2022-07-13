@@ -1,25 +1,3 @@
-def get_unsortness(array):
-    unsortness = 0
-    for i, e in enumerate(array):
-        for j in array[i:]:
-            if (e > j):
-                unsortness += 1
-    return unsortness
-def _read_input():
-    
-    a = input()
-    input()
-    a = input()
-    M, N = a.split()
-    M = int(M)
-    N = int(N)
-
-    arr = []
-    for line in range(N):
-        arr.append(input())
-    
-    return arr
-
 def insertion_sort(sort_array, arr2):
     for i in range(len(sort_array)):
         key = sort_array[i]
@@ -31,18 +9,35 @@ def insertion_sort(sort_array, arr2):
             j = j-1
         arr2[j+1] = temp
         sort_array[j+1] = key
-    return sort_array
+    return arr2
 
-def sort_data_sets(ds):
+num_sets = int(input())
+
+for h in range(num_sets):
+    input()
+    k = input()
+    str_size, num_str = k.split()
+    str_size = int(str_size)
+    num_str = int(num_str)
+
+    ds = []
+    for line in range(num_str):
+        ds.append(input())
+
     unsortness = []
     for set in ds:
-        unsortness.append(get_unsortness(set))
+        u = 0
+        for i, e in enumerate(set):
+            for j in set[i:]:
+                if (e > j):
+                    u += 1
+        unsortness.append(u)
 
-    insertion_sort(unsortness, ds)
-    return ds
-
-ds = _read_input()
-a = sort_data_sets(ds[:])
-print()
-for i in a:
-    print(i)
+    
+    a = insertion_sort(unsortness, ds[:])
+    
+    for j in a:
+        print(j)
+    if (h + 1) != num_sets:
+        print()
+    
