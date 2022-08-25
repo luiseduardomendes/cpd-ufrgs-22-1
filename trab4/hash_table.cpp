@@ -1,7 +1,12 @@
 #include <iostream>
+#include <iomanip>
+#include <ios>
+#include <fstream>
 #include <vector>
 #include <string>
+#include <cmath>
 #include <ctime>
+#include <stdint.h>
 
 using namespace std;
 
@@ -30,8 +35,11 @@ public:
         this->data = data;
         this->tag = tag;
     }
-    Node print(){
-        cout << this->key << ":\t" << this->data.data << "\t" << this->tag << endl;
+    void operator<< (ofstream &file){
+        file << '|' << 
+            setw(10) << setfill('.') << right << this->key << '|' << 
+            setw(10) << setfill('.') << right << this->data.data << '|' << 
+            setw(30) << setfill('.') << right << this->tag << '|' << endl;
     }
 };
 
@@ -40,16 +48,20 @@ private:
     vector<vector<Node>> table;
     int size;
     int hash(string tag){
-        return (
-            (int)*(tag.begin()) * 
-            (int)*(tag.begin()) +
-            2 * (int)*(tag.end() - 1) 
-        ) % (size);
+        int tagSize = tag.size();
+        int a = (int)*(tag.begin());
+        int b = (int)*(tag.end()-1);
+        int c = (int)*(tag.end()-tagSize/2);
+        int d = (int)*(tag.begin()+tagSize/4);
+        int e = (int)*(tag.begin()+3*tagSize/4);
+        int f = (a*a + b*e + a*e + c*c + e*c + a*c);
+
+        return f % this->size;
     }
 public:
     HashTable(int size){
         this->size = size;
-        for (int i = 0; i < size; i ++){
+        for (int i = 0; i < this->size; i ++){
             vector<Node> v;
             v.clear();
             table.push_back(v);
@@ -92,52 +104,130 @@ public:
                 break;
             }
         }
+        if (cont == 0)
+            cont = -1;
         return cont;
     }
 
-    void print(){
-        cout << "Chave   Pontos  Equipe" << endl << endl;
+    void operator>> (ofstream &file) {
+        file << setw(55) << setfill('_') << right << ' ' << endl;
+        file << '|' << setw(10) << setfill(' ') << right << "Chave" << '|' << 
+            setw(10) << setfill(' ') << right << "Dados" << '|' << 
+            setw(30) << setfill(' ') << right << "Nome" << '|' << endl;
+        file << '+' << setw(11) << setfill('-') << right << '+' << 
+            setw(11) << setfill('-') << right << '+' <<
+            setw(31) << setfill('-') << right << '+' << endl;
         for (vector<vector<Node>>::iterator it1 = table.begin(); it1 !=  table.end(); it1 ++){
             vector<Node> list = *it1;
             if (list.size() != 0){
                 for (vector<Node>::iterator it2 = list.begin(); it2 != list.end(); it2 ++){
-                    cout << it2->key << ":\t" << it2->data.data << "\t" << it2->tag << endl;
+                    file << '|' << 
+                        setw(10) << setfill('.') << right << it2->key << '|' << 
+                        setw(10) << setfill('.') << right << it2->data.data << '|' << 
+                        setw(30) << setfill('.') << right << it2->tag << '|' << endl;
                 }
             }
         }
     }
+    int usedEntries(){
+        int used = 0;
+        for (int i = 0; i < this->size; i ++) {
+            if (table[i].size() != 0){
+                used ++;
+            }
+        }
+        return used;
+    }
+    int emptyEntries(){
+        int empty = 0;
+        for (int i = 0; i < this->size; i ++) {
+            if (table[i].size() == 0){
+                empty ++;
+            }
+        }
+        return empty;
+    }
+    int minList(){
+        int min = table[0].size();
+        for (int i = 0; i < this->size; i ++){
+            if (table[i].size() < min){
+                min = table[i].size();
+            }
+        }
+        return min;
+    }  
+    int meanList(){
+        float mean = 0;
+        for (int i = 0; i < this->size; i ++){
+            mean += table[i].size();
+        }
+        return mean/this->size;
+    }  
+    int maxList(){
+        int max = 0;
+        for (int i = 0; i < this->size; i ++){
+            if (table[i].size() > max){
+                max = table[i].size();
+            }
+        }
+        return max;
+    }  
+
+    void showStatistics(){
+        int usedEntries = this->usedEntries();
+        int emptyEntries = this->emptyEntries();
+        float ocupation = (float)usedEntries/(emptyEntries+usedEntries);
+
+        cout << setw(20) << setfill('.') << left << "entradas usadas:" << usedEntries << endl;
+        cout << setw(20) << setfill('.') << left << "entradas vazias:" << emptyEntries << endl;
+        cout << setw(20) << setfill('.') << left << "taxa de ocupacao:" << ocupation << endl;
+        cout << setw(20) << setfill('.') << left << "lista minima:" << minList() << endl;
+        cout << setw(20) << setfill('.') << left << "lista maxima:" << maxList() << endl;
+        cout << setw(20) << setfill('.') << left << "lista media:" << meanList() << endl;
+    }
 };
 
-int main(){
-    srand(time(0));
-    int n = 10, randmax = 50000;
-    HashTable table(n);
-    vector<string> tags = {
-        "Liberty",
-        "Netshoes Miners",
-        "Rensga eSports",
-        "LOUD",
-        "FURIA eSports",
-        "Flamengo eSports",
-        "RED Canids",
-        "Kabum eSports",
-        "INTZ eSports",
-        "paiN Gaming"
-    };
-    vector<int> points = {
-        8, 8, 1, 12, 15, 6, 13, 11, 4, 12
-    };
-    
 
-    for(int i = 0; i < n; i ++){
-        table.insert(tags[i], points[i]);
+void parsing(string filename, HashTable& hashTable){
+    ifstream file(filename.c_str());
+    if(!file.is_open())
+        return;
+    string line;
+
+    while (!file.eof()){
+        file >> line;
+        hashTable.insert(line, 0);
     }
-    table.print();
+        
 
-    Node node;
-    node = table.search("paiN Gaming");
+    file.close();
+}
 
-    node.print();
+int fileLineNumber(string filename){
+    ifstream file(filename);
+    int lineNumber = 0;
+    string line;
     
+    while (!file.eof()){
+        file >> line;
+        lineNumber ++;
+    }
+    return lineNumber;
+}
+
+
+int main(int argv, char **argc){
+    string filename = argc[1];
+    int filesize = fileLineNumber(filename);
+    HashTable hashTable(filesize);
+    ofstream output(filename.substr(0, filename.find_last_of('.'))+"_output" + filename.substr(filename.find_last_of('.'), filename.size()));
+
+    parsing(filename, hashTable);
+    
+    hashTable >> output;
+    
+    hashTable.showStatistics();
+    
+
     return 0;
 }
