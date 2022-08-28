@@ -129,61 +129,69 @@ public:
             }
         }
     }
-    int usedEntries(){
+    vector<int> linkedListStats(){
         int used = 0;
-        for (int i = 0; i < this->size; i ++) {
-            if (table[i].size() != 0){
-                used ++;
-            }
-        }
-        return used;
-    }
-    int emptyEntries(){
         int empty = 0;
         for (int i = 0; i < this->size; i ++) {
-            if (table[i].size() == 0){
-                empty ++;
-            }
+            if (table[i].size() != 0)
+                used ++;
+            if (table[i].size() == 0)
+                empty ++;   
         }
-        return empty;
+        vector<int> ret = {used, empty};
+        return ret;
     }
-    int minList(){
+
+    vector<int> statsLists(){
         int min = table[0].size();
-        for (int i = 0; i < this->size; i ++){
-            if (table[i].size() < min){
-                min = table[i].size();
-            }
-        }
-        return min;
-    }  
-    int meanList(){
+        int max = 0;
         float mean = 0;
         for (int i = 0; i < this->size; i ++){
             mean += table[i].size();
-        }
-        return mean/this->size;
-    }  
-    int maxList(){
-        int max = 0;
-        for (int i = 0; i < this->size; i ++){
-            if (table[i].size() > max){
+            if (table[i].size() < min)
+                min = table[i].size();
+            if (table[i].size() > max)
                 max = table[i].size();
+        }
+        vector<float> ret = {(float)mean/this->size, min, max};
+        return ret;
+    }  
+
+    void showStatistics(ofstream output){
+        vector<int> temp = this->linkedListStats();
+        int usedEntries = temp[0];
+        int emptyEntries = temp[1];
+        float ocupation = (float)usedEntries/(emptyEntries+usedEntries);
+        temp = this->statsLists();
+        float meanList = temp[0];
+        int minList = (int)temp[1];
+        int maxList = (int)temp[2];
+
+        output << setw(20) << setfill('.') << left << "entradas usadas:" << usedEntries << endl;
+        output << setw(20) << setfill('.') << left << "entradas vazias:" << emptyEntries << endl;
+        output << setw(20) << setfill('.') << left << "taxa de ocupacao:" << ocupation << endl;
+        output << setw(20) << setfill('.') << left << "lista minima:" << minList << endl;
+        output << setw(20) << setfill('.') << left << "lista maxima:" << maxList << endl;
+        output << setw(20) << setfill('.') << left << "lista media:" << meanList << endl;
+    }
+    void showStatisticsSearches(ofstream output, vector<string> searches){
+        int min = INT64_MAX, max = 0, mean = 0, found = 0; 
+        for (vector<string>::iterator search = output.begin(); 
+        search != output.end(); search ++){
+            int temp = this->search_statistics(*search);
+            if (temp == -1)
+                output << search << " MISS" << endl;
+            else{
+                output << search << " HIT " << temp << endl;
+                if (temp < min)
+                    min = temp;
+                if (temp > max)
+                    max = temp;
+                mean += temp
+                found += 1;
             }
         }
-        return max;
-    }  
-
-    void showStatistics(){
-        int usedEntries = this->usedEntries();
-        int emptyEntries = this->emptyEntries();
-        float ocupation = (float)usedEntries/(emptyEntries+usedEntries);
-
-        cout << setw(20) << setfill('.') << left << "entradas usadas:" << usedEntries << endl;
-        cout << setw(20) << setfill('.') << left << "entradas vazias:" << emptyEntries << endl;
-        cout << setw(20) << setfill('.') << left << "taxa de ocupacao:" << ocupation << endl;
-        cout << setw(20) << setfill('.') << left << "lista minima:" << minList() << endl;
-        cout << setw(20) << setfill('.') << left << "lista maxima:" << maxList() << endl;
-        cout << setw(20) << setfill('.') << left << "lista media:" << meanList() << endl;
+        mean = (float)mean / found;
     }
 };
 
@@ -198,8 +206,19 @@ void parsing(string filename, HashTable& hashTable){
         file >> line;
         hashTable.insert(line, 0);
     }
-        
+    file.close();
+}
 
+void parsing_searches(string filename, vector<string> &list){
+    ifstream file(filename.c_str());
+    if(!file.is_open())
+        return;
+    string line;
+
+    while (!file.eof()){
+        file >> line;
+        list.push_back(line);
+    }
     file.close();
 }
 
@@ -219,14 +238,33 @@ int fileLineNumber(string filename){
 int main(int argv, char **argc){
     string filename = argc[1];
     int filesize = fileLineNumber(filename);
-    HashTable hashTable(filesize);
-    ofstream output(filename.substr(0, filename.find_last_of('.'))+"_output" + filename.substr(filename.find_last_of('.'), filename.size()));
 
+    vector<int> experiments = {503, 2503, 5003, 7507};
+    /*HashTable hashTable(filesize);
+    ofstream output(filename.substr(0, filename.find_last_of('.'))+"_output" + filename.substr(filename.find_last_of('.'), filename.size()));
+    
     parsing(filename, hashTable);
-    
     hashTable >> output;
+    hashTable.showStatistics();*/
+
+    for (vector<int>::iterator it = experiments.begin();
+                    it != experiments.end(); it ++){
+        tableSize = *it;
+        HashTable hashTable = new HashTable(tableSize);
+        ofstream output("Experimento"+string("%d", tableSize)+".txt");
+
+        parsing(filename, hashTable);
+        hashTable.showStatistics(output);
+        vector<string> searches;
+        parsing_searches(argc[2], searches);
+        hashTable.showStatisticsSearches(output, searches);
+
+        output.close();
+    }
     
-    hashTable.showStatistics();
+
+    
+
     
 
     return 0;
