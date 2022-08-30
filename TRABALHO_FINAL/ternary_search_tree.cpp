@@ -23,7 +23,7 @@ tst::Node::Node(Data *data, char key){
 }
 
 tst::Tree::Tree(){
-    root = NULL;
+    root = new Node(NULL, '\0');
 }
 
 bool tst::Tree::isEmpty(){
@@ -37,10 +37,13 @@ int to_int(char a){
 void tst::Tree::insert(std::string word, Data *data){
     char ch;
     Node *node = this->root;
-    for (std::string::iterator it = word.begin(); it != word.end() - 1; it ++, ch = *it){
+
+    for (std::string::iterator it = word.begin(); it != (word.end()); it ++){        
+        ch = *it;
         if (node->next[to_int(ch)] == NULL){
             node->next[to_int(ch)] = new Node(NULL, ch);
         }
+        node = node->next[to_int(ch)];
     }
     node->data = data; 
 }
@@ -50,7 +53,18 @@ void tst::Tree::remove(std::string word){
 }
 
 int tst::Tree::search(std::string word){
-
+    char ch;
+    Node *node = this->root;
+    for (std::string::iterator it = word.begin(); it != word.end(); it ++){
+        ch = *it;
+        if (node->next[to_int(ch)] == NULL)
+            return -1;
+        node = node->next[to_int(ch)];
+    }
+    if (node->data == NULL)
+        return -1;
+    else
+        return node->data->sofifa_id;
 }
 
 void tst::Tree::read_csv(std::ifstream input){
