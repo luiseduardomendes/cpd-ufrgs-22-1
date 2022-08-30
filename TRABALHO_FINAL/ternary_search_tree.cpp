@@ -32,6 +32,7 @@ bool tst::Tree::isEmpty(){
 
 int to_int(char a){
     return a - 0x20;
+
 }
 
 void tst::Tree::insert(std::string word, Data *data){
@@ -40,10 +41,11 @@ void tst::Tree::insert(std::string word, Data *data){
 
     for (std::string::iterator it = word.begin(); it != (word.end()); it ++){        
         ch = *it;
-        if (node->next[to_int(ch)] == NULL){
-            node->next[to_int(ch)] = new Node(NULL, ch);
+        int c = to_int(ch);
+        if (node->next[c] == NULL){
+            node->next[c] = new Node(NULL, ch);
         }
-        node = node->next[to_int(ch)];
+        node = node->next[c];
     }
     node->data = data; 
 }
@@ -57,9 +59,10 @@ int tst::Tree::search(std::string word){
     Node *node = this->root;
     for (std::string::iterator it = word.begin(); it != word.end(); it ++){
         ch = *it;
-        if (node->next[to_int(ch)] == NULL)
+        int c = to_int(ch);
+        if (node->next[c] == NULL)
             return -1;
-        node = node->next[to_int(ch)];
+        node = node->next[c];
     }
     if (node->data == NULL)
         return -1;
