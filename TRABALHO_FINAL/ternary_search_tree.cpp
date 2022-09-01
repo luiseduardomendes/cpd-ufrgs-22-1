@@ -1,5 +1,5 @@
 #include "ternary_search_tree.hpp"
-
+#include "parser.hpp"
 
 tst::Data::Data(int user_id, int sofifa_id, float rating){
     this->user_id = user_id;
@@ -70,6 +70,77 @@ int tst::Tree::search(std::string word){
         return node->data->sofifa_id;
 }
 
-void tst::Tree::read_csv(std::ifstream input){
+void tst::Tree::read_csv(std::ifstream &input){
+    std::vector<std::string> names;
+    aria::csv::CsvParser parser(input);
+    for (auto& row : parser) {
+        int i = 0;
+        std::string name;
+        int sofifaId;
+        for (auto& field : row) {
+ 
+            switch (i) {
+            case 0:
+                sofifaId = atoi(field.c_str());
+                break;
+            case 1:
+                name = field;
+                break;
+            case 2: 
+                break;
+            }
+            
+            i ++;
+        }
+        insert(name, new tst::Data(0,sofifaId, 0));
+    } 
+}
+
+bool isInVector(std::vector<tst::Node*> v, tst::Node* node){
+    for (std::vector<tst::Node*>::iterator  it = v.begin(); it != v.end(); it ++)
+        if ((*it) == node)
+            return true;
+    return false;
+}
+
+void tst::Tree::find_words_by_radix(Node *node, std::string current_word, std::vector<tst::Node*> *visited, std::vector<std::string> *word_list){
+    
+    visited->push_back(node);
+    current_word.push_back(node->key);
+    
+    if (word_list->size() > 20)
+        return;
+ 
+    if (node->data != NULL) 
+        word_list->push_back(current_word);
+    
+    for (std::vector<Node*>::iterator it = node->next.begin(); it != node->next.end(); it ++)
+        if (*it != NULL && !isInVector(*visited, *it))
+            find_words_by_radix(*it, current_word, visited, word_list);
+        
+    
+}
+
+std::vector<std::string> tst::Tree::search_by_radix(std::string radix) {
+    std::vector<std::string> *wl = new std::vector<std::string>; 
+    std::vector<std::string> word_list = *wl;
+
+    std::string current_word = "";
+    std::vector<tst::Node*> visited;
+    
+    tst::Node *node = this->root;
+     
+    for (std::string::iterator it = radix.begin(); it != radix.end(); it ++){
+        char ch = *it;
+ 
+        current_word.push_back(ch); 
+        if (node->next[to_int(ch)] == NULL)
+            return word_list;/* constant-expression */
+
+        node = node->next[to_int(ch)];
+    }
+    current_word.pop_back();
+    find_words_by_radix(node, current_word, &visited, wl);
+    return *wl;
 
 }

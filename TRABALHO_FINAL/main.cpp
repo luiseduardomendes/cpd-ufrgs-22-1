@@ -1,34 +1,31 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
 #include <string>
 #include "ternary_search_tree.hpp"
 
 using namespace std;
 
+void coutVector(std::vector<std::string> vec){
+    for (vector<string>::iterator it = vec.begin(); it != vec.end(); it ++)
+        cout << *it << endl;
+}
+
 int main(int argv, char **argc){
-    
     tst::Tree tree;
 
-    vector<string> names = {
-        {"Carlos Menin"},
-        {"Eduardo Bolson"},
-        {"Heloisa Marques"},
-        {"Luis Mendes"},
-        {"Vinicius Alves"}
-    };
+    std::ifstream input(argc[1]);
+    tree.read_csv(input);
 
-    string name;
-    int count = 0;
-
-    for (vector<string>::iterator it = names.begin(); it != names.end(); it ++){
-        name = *it;
-        count ++;
-        tree.insert(name, new tst::Data(count, count*2, 1.5));
+    std::string user_input;
+    std::cout << "Search  by a player: " << endl;
+    std::cin >> user_input;
+    while (user_input != string("exit")){
+        std::cout << std::endl << "Soluções da busca:" << std::endl;
+        coutVector(tree.search_by_radix(user_input));
+        std::cout << std::endl << "Search by a player: " << std::endl;
+        std::cin >> user_input;
     }
-
-    cout << tree.search("Carlos Menin") << endl;
-    cout << tree.search("Luis Mendes") << endl;
-    cout << tree.search("Carlos Eduardo Menin") << endl;
     
     return 0;
 }

@@ -1,0 +1,25 @@
+/*
+    vector<string> names = {
+        {"Carlos Menin"},
+        {"Eduardo Bolson"},
+        {"Heloisa Marques"},
+        {"Luis Mendes"},
+        {"Vinicius Alves"},
+        {"Vini Alves"},
+        {"Vinicius Boff"}
+    };
+    vector<string> ret;
+
+    string name;
+    int count = 0;
+
+    for (vector<string>::iterator it = names.begin(); it != names.end(); it ++){
+        name = *it;
+        count ++;
+        tree.insert(name, new tst::Data(count, count*2, 1.5));
+    }
+
+    ret = tree.search_by_radix("Vini");
+    for (vector<string>::iterator it = ret.begin(); it != ret.end(); it ++){
+        cout << *it << endl;
+    }*/
