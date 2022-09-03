@@ -23,6 +23,7 @@ tst::Node::Node(Data *data, char key){
 }
 
 tst::Tree::Tree(){
+    this->size = 0;
     root = new Node(NULL, '\0');
 }
 
@@ -47,7 +48,10 @@ void tst::Tree::insert(std::string word, Data *data){
         }
         node = node->next[c];
     }
-    node->data = data; 
+    if (node->data == NULL){
+        node->data = data; 
+        this->size ++;
+    }
 }
 
 void tst::Tree::remove(std::string word){
@@ -103,7 +107,7 @@ bool isInVector(std::vector<tst::Node*> v, tst::Node* node){
     return false;
 }
 
-void tst::Tree::find_words_by_radix(Node *node, std::string current_word, std::vector<tst::Node*> *visited, std::vector<std::string> *word_list){
+void tst::Tree::find_words_by_radix(Node *node, std::string current_word, std::vector<tst::Node*> *visited, std::vector<std::string> *word_list, std::vector<int> *ids){
     
     visited->push_back(node);
     current_word.push_back(node->key);
@@ -111,17 +115,19 @@ void tst::Tree::find_words_by_radix(Node *node, std::string current_word, std::v
     if (word_list->size() > 20)
         return;
  
-    if (node->data != NULL) 
+    if (node->data != NULL) {
         word_list->push_back(current_word);
+        ids->push_back(node->data->sofifa_id);
+    }
     
     for (std::vector<Node*>::iterator it = node->next.begin(); it != node->next.end(); it ++)
         if (*it != NULL && !isInVector(*visited, *it))
-            find_words_by_radix(*it, current_word, visited, word_list);
+            find_words_by_radix(*it, current_word, visited, word_list, ids);
         
     
 }
 
-std::vector<std::string> tst::Tree::search_by_radix(std::string radix) {
+std::vector<std::string> tst::Tree::search_by_radix(std::string radix, std::vector<int> *sofifa_ids) {
     std::vector<std::string> *wl = new std::vector<std::string>; 
     std::vector<std::string> word_list = *wl;
 
@@ -135,12 +141,12 @@ std::vector<std::string> tst::Tree::search_by_radix(std::string radix) {
  
         current_word.push_back(ch); 
         if (node->next[to_int(ch)] == NULL)
-            return word_list;/* constant-expression */
+            return word_list;
 
         node = node->next[to_int(ch)];
     }
     current_word.pop_back();
-    find_words_by_radix(node, current_word, &visited, wl);
+    find_words_by_radix(node, current_word, &visited, wl, sofifa_ids);
     return *wl;
 
 }
