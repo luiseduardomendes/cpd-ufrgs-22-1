@@ -31,19 +31,31 @@ int main(int argv, char **argc){
     std::ofstream output("out_.txt");
 
     table >> output;
+    output.close();
 
     std::string user_input;
     std::cout << "Search  by a player: " << endl;
     std::cin >> user_input;
     while (user_input != string("exit")){
         std::vector<int> ids;
-        std::cout << std::endl << "First 20 search results:" << std::endl;
+        int selected;
         std::vector<std::string> temp = tree.search_by_radix(user_input, &ids);
-        coutVector(temp);
-        if (temp.size() == 1){
+        if (temp.size() > 1){
+            std::cout << std::endl << "First 20 search results:" << std::endl;
+            coutVector(temp);
+            std::cout << "Write the number of the player you wanna search" << std::endl;
+            std::cin >> selected;
+            int id = ids[selected - 1];
+            ht::Node node = table.search(id);
+            node.data >> std::cout;
+        }
+        else if (temp.size() == 1){
             int id = ids[0];
             ht::Node node = table.search(id);
             node.data >> std::cout;
+        }
+        else{
+            std::cout << "There's no result to your search!" << std::endl;
         }
         std::cout << std::endl << "Search by a player: " << std::endl;
         std::cin >> user_input;

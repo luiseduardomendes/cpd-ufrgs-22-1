@@ -46,6 +46,6 @@ namespace ht{
         void insert(int sofifa_id, Data data);
         void remove(int sofifa_id);
         Node search(int sofifa_id);
-        void operator>>(std::ofstream &file);
+        void operator>>(std::ostream &file);
     };
 }
